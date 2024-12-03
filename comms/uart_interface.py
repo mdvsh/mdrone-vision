@@ -2,14 +2,14 @@
 import serial
 import struct
 import time
-from ..config.config import UARTConfig
-from ..core.tag_detector import TagDetection
+from config.config import UARTConfig
+from core.tag_detector import TagDetection
 
 class UARTInterface:
     def __init__(self, config: UARTConfig):
         self.config = config
         self.ser = serial.Serial(config.port, config.baudrate)
-    
+
     def send_detection(self, detection: TagDetection) -> bool:
         timestamp = int(time.time() * 1000)
         try:
@@ -25,7 +25,7 @@ class UARTInterface:
             return True
         except Exception as e:
             return False
-    
+
     def send_no_detection(self) -> bool:
         timestamp = int(time.time() * 1000)
         try:
@@ -38,7 +38,7 @@ class UARTInterface:
             return True
         except Exception as e:
             return False
-    
+
     def cleanup(self):
         if self.ser and self.ser.is_open:
             self.ser.close()

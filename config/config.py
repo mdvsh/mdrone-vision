@@ -9,8 +9,8 @@ class CameraConfig:
 
 @dataclass
 class TagConfig:
-    landing_tag_id: int = 73      # Large landing pad tag ID
-    precision_tag_id: int = 37    # Small precision tag ID
+    landing_tag_id: int = 37      # Large landing pad tag ID
+    precision_tag_id: int = 73    # Small precision tag ID
     landing_tag_size: float = 120  # mm
     precision_tag_size: float = 40 # mm
     tag_family: str = "tagCustom48h12"
