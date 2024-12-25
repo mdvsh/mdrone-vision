@@ -38,15 +38,19 @@ def main():
             if detections:
                 for detection in detections:
                     if uart.send_detection(detection):
-                        logging.info(
+                        pos_x = float(detection.position[0])
+                        pos_y = float(detection.position[1])
+                        pos_z = float(detection.position[2])
+                        rot_x = float(detection.rotation[0])
+                        rot_y = float(detection.rotation[1])
+                        rot_z = float(detection.rotation[2])
+
+                        log_msg = (
                             f"Tag {detection.tag_id}: "
-                            f"pos=({detection.position[0]:.2f}, "
-                            f"{detection.position[1]:.2f}, "
-                            f"{detection.position[2]:.2f}) "
-                            f"rpy=({detection.rotation[0]:.2f}, "
-                            f"{detection.rotation[1]:.2f}, "
-                            f"{detection.rotation[2]:.2f})"
+                            f"pos=({pos_x:.2f}, {pos_y:.2f}, {pos_z:.2f}) "
+                            f"rpy=({rot_x:.2f}, {rot_y:.2f}, {rot_z:.2f})"
                         )
+                        logging.info(log_msg)
             else:
                 uart.send_no_detection()
 

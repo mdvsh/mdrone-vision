@@ -19,12 +19,12 @@ class TagDetector:
         self.camera_matrix = camera_matrix
         self.dist_coeffs = dist_coeffs
         self.detector = apriltag(config.tag_family, threads=1)
-        
+
         self.tag_points = {
                 config.landing_tag_id: self._create_tag_points(config.landing_tag_size),
                 config.precision_tag_id: self._create_tag_points(config.precision_tag_size)
         }
-    
+
     def _create_tag_points(self, size: float) -> np.ndarray:
         """Create 3D reference points for a tag."""
         half_size = size / 2
@@ -34,7 +34,7 @@ class TagDetector:
                 [ half_size, -half_size, 0],
                 [-half_size, -half_size, 0]
         ], dtype=np.float32)
-    
+
     def _retry_detection(self, gray: np.ndarray, retries: int = 3) -> list:
         """Retry detection with multiple attempts in case of threading errors."""
         for attempt in range(retries):
@@ -55,37 +55,37 @@ class TagDetector:
         """Detect and process AprilTags in frame."""
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         detections = self._retry_detection(gray)
-        
+
         results = []
         for det in detections:
             tag_id = det['id']
             if tag_id not in self.tag_points:
                 continue
-                
+
             corners = np.array(det['lb-rb-rt-lt'], dtype=np.float32)
             object_points = self.tag_points[tag_id]
-            
+
             ret, rvec, tvec = cv2.solvePnP(
                 object_points, corners,
                 self.camera_matrix, self.dist_coeffs,
                 flags=cv2.SOLVEPNP_IPPE_SQUARE
             )
-            
+
             euler_angles = get_euler_angles(rvec)
-            
+
             position_ned = np.array([
                 tvec[0] / 1000.0,    # X: right → North
                 tvec[1] / 1000.0,    # Y: down → East
                 -tvec[2] / 1000.0    # Z: forward → Down
             ])
-            
+
             results.append(TagDetection(
                 tag_id=tag_id,
-                position=position_ned, 
+                position=position_ned,
                 rotation=euler_angles,
                 corners=corners
             ))
-        
+
         return results
 
 # helper
